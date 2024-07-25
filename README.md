@@ -16,8 +16,8 @@ Special thanks to [RedHeadEmile](https://github.com/RedHeadEmile/GTA-V-Heist-Hel
 - Run `python main.py`
 
 # Warning
-- `Python 3.8` is recommended python version for this repository
-- You must use `1920x1080` resolution, otherwise the script would make some errors.
+- `Python 3.8` is the recommended python version for this repository
+- `1920x1080` resolution is recommended but other resolutions **might** work
 - On `Keypad Cracker`, you have to press `F6` on the latest pattern
 
 # Showcase
