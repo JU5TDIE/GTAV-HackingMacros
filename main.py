@@ -1,11 +1,11 @@
 import sys
 import time
 import pynput
-import win32gui
 from threading import Thread
+from win32gui import FindWindow, GetWindowRect
 from hacks import casinofingerprint, casinokeypad, cayofingerprint, cayovoltage
 
-def PrintBanner():
+def print_banner():
     print('''
 
 ██╗░░░░░███████╗░██████╗████████╗███████╗██████╗░  ██╗░░░██╗███████╗██████╗░  ██████╗░░░░░█████╗░
@@ -16,56 +16,57 @@ def PrintBanner():
 ╚══════╝╚══════╝╚═════╝░░░░╚═╝░░░╚══════╝╚═╝░░╚═╝  ░░░╚═╝░░░╚══════╝╚═╝░░╚═╝  ╚══════╝╚═╝░╚════╝░
                                                                                           ''')
 
-def PrintCredits():
+def print_credits():
     print('''
 Made by JUSTDIE
 Special thanks to RedHeadEmile
-    ''')																					
+    ''')
     
 def check_window():
     print('[*] Searching Grand Theft Auto V...')
 
     while True:
-        hwnd = win32gui.FindWindow(None, "Grand Theft Auto V")
+        hwnd = FindWindow(None, "Grand Theft Auto V")
         
         if hwnd:
             print('[*] Grand Theft Auto V Detected!')
             print('')
             print('=============================================')
-            return True
+            return GetWindowRect(hwnd)
         
         time.sleep(1)
 
-def casino_fingerprint():
-    thread = Thread(target = casinofingerprint.main)
+def casino_fingerprint(bbox):
+    thread = Thread(target=casinofingerprint.main, args=(bbox,))
     thread.start()
 
-def casino_keypad():
-    thread = Thread(target = casinokeypad.main)
+def casino_keypad(bbox):
+    thread = Thread(target=casinokeypad.main, args=(bbox,))
     thread.start()
 
-def cayo_fingerprint():
-    thread = Thread(target = cayofingerprint.main)
+def cayo_fingerprint(bbox):
+    thread = Thread(target=cayofingerprint.main, args=(bbox,))
     thread.start()
 
-def cayo_voltage():
-    thread = Thread(target = cayovoltage.main)
+def cayo_voltage(bbox):
+    thread = Thread(target=cayovoltage.main, args=(bbox,))
     thread.start()
 
 def shutdown():
     sys.exit()
 
 def main():
-    PrintBanner()
-    PrintCredits()
+    print_banner()
+    print_credits()
 
-    if check_window():
+    bbox = check_window()
+    if bbox:
         with pynput.keyboard.GlobalHotKeys({
                 '<F4>': shutdown,
-                '<F5>': casino_fingerprint,
-                '<F6>': casino_keypad,
-                '<F7>': cayo_fingerprint,
-                '<F8>': cayo_voltage}) as h:
+                '<F5>': lambda: casino_fingerprint(bbox),
+                '<F6>': lambda: casino_keypad(bbox),
+                '<F7>': lambda: cayo_fingerprint(bbox),
+                '<F8>': lambda: cayo_voltage(bbox)}) as h:
             h.join()
 
 if __name__ == "__main__":

@@ -4,8 +4,6 @@ import keyboard
 import numpy as np
 from PIL import Image, ImageGrab
 
-bbox = (0, 0, 1920, 1080)
-
 targets = [(907, 331, 1562, 431), # split the big digit in 8 parts
 (907, 404, 1562, 504),
 (907, 500, 1562, 600),
@@ -34,9 +32,10 @@ def index(part, parts):
             return i
     return -1
 
-def main():
+def main(bbox):
     print('[*] Cayo Perico Fingerprint')
     im = ImageGrab.grab(bbox)
+    im = im.resize((1920,1080))
 
     parts = []
     for target in targets:

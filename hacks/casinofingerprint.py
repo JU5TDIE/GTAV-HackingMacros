@@ -4,8 +4,6 @@ import keyboard
 import numpy as np
 from PIL import Image, ImageGrab
 
-bbox = (0, 0, 1920, 1080)
-
 tofind = (950, 155, 1335, 685)
 
 parts = [[(482, 279, 482 + 102, 279 + 102), (0, 0)],
@@ -27,10 +25,10 @@ def is_in(img, subimg):
         return True
     return False
 
-def main():
+def main(bbox):
     print('[*] Casino Fingerprint')
     im = ImageGrab.grab(bbox)
-
+    im = im.resize((1920,1080))
     sub0_ = im.crop(tofind)
     sub0 = cv2.cvtColor(np.array(sub0_.resize((round(sub0_.size[0] * 0.77), round(sub0_.size[1] * 0.77)))), cv2.COLOR_BGR2GRAY) # need to resize the image because fingerprints parts is smaller than the image + need gray image to do the matchTemplate
 

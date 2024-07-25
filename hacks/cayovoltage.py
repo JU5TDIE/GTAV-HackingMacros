@@ -32,8 +32,6 @@ moves = {
     (0, 2, 1, 1, 2, 0): ['enter', 'w', 'return', 'enter', 'return', 'enter', 'return'] # (1-3) + (2-2) + (3-1) 
 }
 
-bbox = (0, 0, 1920, 1080)
-
 # objective numbers
 objectivenumber_height = [123, 137, 137, 154, 173, 173, 195] #objective numbers have same height
 objectivenumber_length_0 = [865, 849, 881, 865, 849, 881, 865] # first number
@@ -105,10 +103,11 @@ def calculate(a, b, c):
         print('[*] END')
         print('=============================================')
 
-def main():
+def main(bbox):
     print('[*] Cayo Voltage Hack')
 
     im = ImageGrab.grab(bbox)
+    im = im.resize((1920,1080))
 
     grayImage = cv2.cvtColor(np.array(im), cv2.COLOR_RGB2GRAY)
     (thresh, blackAndWhiteImage) = cv2.threshold(grayImage, 127, 255, cv2.THRESH_BINARY)

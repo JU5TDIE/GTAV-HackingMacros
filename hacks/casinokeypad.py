@@ -15,7 +15,7 @@ DIGITS_LOOKUP = {
 height = [2, 110, 218, 326, 434]
 length = [50, 158, 266, 374, 482, 590]
 
-bbox = (454, 300, 1080, 830)
+tofind = (454, 300, 1080, 830)
 
 def dot_check(a, img):
     hint = []
@@ -30,9 +30,10 @@ def dot_check(a, img):
 
     return DIGITS_LOOKUP[tuple(hint)]
 
-def check():
+def check(bbox):
     while True:
-        screen = ImageGrab.grab(bbox)
+        im = ImageGrab.grab(bbox)
+        screen = im.resize((1920,1080)).crop(tofind)
         grayImage = cv2.cvtColor(np.array(screen), cv2.COLOR_BGR2GRAY)
         (thresh, blackAndWhiteImage) = cv2.threshold(grayImage, 215, 255, cv2.THRESH_BINARY)
         crop_img = blackAndWhiteImage[92:92 + 1, 44:44 + 1]
@@ -89,10 +90,11 @@ def calculate(numbers):
     print('[*] END')
     print('=============================================')
 
-def main():
+def main(bbox):
     print('[*] Casino Keypad Cracker')
 
     im = ImageGrab.grab(bbox)
+    im = im.resize((1920,1080)).crop(tofind)
 
     hsv = cv2.cvtColor(np.array(im), cv2.COLOR_RGB2HSV)
         
@@ -110,5 +112,5 @@ def main():
     for a in range(0, 6):
         numbers.append(dot_check(a, blackAndWhiteImage))
     
-    check()
+    check(bbox)
     calculate(numbers)
