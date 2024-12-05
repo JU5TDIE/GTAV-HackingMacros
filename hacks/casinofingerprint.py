@@ -3,6 +3,7 @@ import time
 import keyboard
 import numpy as np
 from PIL import Image, ImageGrab
+from collections import deque, namedtuple
 
 tofind = (950, 155, 1335, 685)
 
@@ -25,6 +26,54 @@ def is_in(img, subimg):
         return True
     return False
 
+def find_shortest_solution(target_coordinates):
+    Point = namedtuple('Point', ('x', 'y'))
+    rows, cols = 4, 2
+    directions = [(-1, 0, 's'), (1, 0, 'd'), (0, 1, 'w'), (0, -1, 'a')]  # (delta_x, delta_y, key)
+
+    target_coordinates = [p if isinstance(p, Point) else Point(*p) for p in target_coordinates]
+    num_targets = len(target_coordinates)
+    assert num_targets == 4, 'Wrong number of targets'
+    target_mask = 0
+    for target in target_coordinates:
+        target_mask |= 1 << ((target.y * cols) + target.x)
+
+    # BFS initialization
+    current_pos = Point(0, 0)
+    visited_mask = 1
+    path = list() if current_pos not in target_coordinates else ['return']
+    queue = deque([(current_pos, visited_mask, path)])  # (current_position, visited_mask, path)
+
+    # loop until all points have been visited or a solution has been found
+    while len(queue) > 0:
+        current_pos, visited_mask, path = queue.popleft()
+
+        # if all target points are visited, return the path
+        if visited_mask & target_mask == target_mask:
+            return path
+
+        # explore neighbors
+        for delta_x, delta_y, key in directions:
+            next_pos = Point(current_pos.x + delta_x, (current_pos.y + delta_y) % rows)
+            # skip if x is out of range, y is allowed to wrap
+            if next_pos.x < 0 or next_pos >= cols:
+                continue
+
+            pos_mask = 1 << ((next_pos.y * cols) + next_pos.x)
+            next_visited_mask = visited_mask | pos_mask
+            # skip if visited
+            if visited_mask == next_visited_mask:
+                continue
+
+            next_path = path.copy()
+            next_path.append(key)
+            # if next_pos is a target point
+            if target_mask & pos_mask != 0:
+                next_path.append('return')
+            queue.append((next_pos, next_visited_mask, next_path))
+
+    raise Exception('No solution found')
+
 def main(bbox):
     print('[*] Casino Fingerprint')
     im = ImageGrab.grab(bbox)
@@ -39,27 +88,8 @@ def main(bbox):
     sub0_.close()
     im.close()
 
-    moves = []
-
-    x, y = 0, 0
-    for pos in togo:
-        while x != pos[0]:
-            if x > pos[0]:
-                x -= 1
-                moves.append("a")
-            else:
-                x += 1
-                moves.append("d")
-        
-        while y != pos[1]:
-            if y > pos[1]:
-                y -= 1
-                moves.append("w")
-            else:
-                y += 1
-                moves.append("s")
-        moves.append("return")
-    moves.append("tab")
+    moves = find_shortest_solution(togo)
+    moves.append('tab')
 
     print('-', moves)
     for key in moves:
