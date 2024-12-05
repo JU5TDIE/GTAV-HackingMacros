@@ -28,6 +28,7 @@ def is_in(img, subimg):
 
 def find_shortest_solution(target_coordinates):
     Point = namedtuple('Point', ('x', 'y'))
+    ReverseLinkedNode = namedtuple("ReverseLinkedNode", ('value', 'prev_node', 'idx'))
     rows, cols = 4, 2
     directions = [(-1, 0, 's'), (1, 0, 'd'), (0, 1, 'w'), (0, -1, 'a')]  # (delta_x, delta_y, key)
 
@@ -41,22 +42,29 @@ def find_shortest_solution(target_coordinates):
     # BFS initialization
     current_pos = Point(0, 0)
     visited_mask = 1
-    path = list() if current_pos not in target_coordinates else ['return']
-    queue = deque([(current_pos, visited_mask, path)])  # (current_position, visited_mask, path)
+    path_head: ReverseLinkedNode = ReverseLinkedNode(None, None, -1)
+    if current_pos in target_coordinates:
+        path_head = ReverseLinkedNode('return', path_head, 0)
+    queue = deque([(current_pos, visited_mask, path_head)])  # (current_position, visited_mask, path_head)
 
     # loop until all points have been visited or a solution has been found
     while len(queue) > 0:
-        current_pos, visited_mask, path = queue.popleft()
+        current_pos, visited_mask, path_head = queue.popleft()
 
-        # if all target points are visited, return the path
+        # if all target points are visited, return the final path
         if visited_mask & target_mask == target_mask:
-            return path
+            path_head = ReverseLinkedNode('tab', path_head, path_head.idx+1)
+            output_list = [None] * (path_head.idx + 1)
+            while path_head.idx >= 0:
+                output_list[path_head.idx] = path_head.value
+                path_head = path_head.prev_node
+            return output_list
 
         # explore neighbors
         for delta_x, delta_y, key in directions:
             next_pos = Point(current_pos.x + delta_x, (current_pos.y + delta_y) % rows)
             # skip if x is out of range, y is allowed to wrap
-            if next_pos.x < 0 or next_pos >= cols:
+            if next_pos.x < 0 or next_pos.x >= cols:
                 continue
 
             pos_mask = 1 << ((next_pos.y * cols) + next_pos.x)
@@ -65,12 +73,11 @@ def find_shortest_solution(target_coordinates):
             if visited_mask == next_visited_mask:
                 continue
 
-            next_path = path.copy()
-            next_path.append(key)
+            path_head = ReverseLinkedNode(key, path_head, path_head.idx+1)
             # if next_pos is a target point
             if target_mask & pos_mask != 0:
-                next_path.append('return')
-            queue.append((next_pos, next_visited_mask, next_path))
+                path_head = ReverseLinkedNode('return', path_head, path_head.idx+1)
+            queue.append((next_pos, next_visited_mask, path_head))
 
     raise Exception('No solution found')
 
@@ -89,7 +96,6 @@ def main(bbox):
     im.close()
 
     moves = find_shortest_solution(togo)
-    moves.append('tab')
 
     print('-', moves)
     for key in moves:
