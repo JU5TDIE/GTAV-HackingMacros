@@ -30,7 +30,7 @@ def find_shortest_solution(target_coordinates):
     Point = namedtuple('Point', ('x', 'y'))
     ReverseLinkedNode = namedtuple("ReverseLinkedNode", ('value', 'prev_node', 'idx'))
     rows, cols = 4, 2
-    directions = [(-1, 0, 's'), (1, 0, 'd'), (0, 1, 'w'), (0, -1, 'a')]  # (delta_x, delta_y, key)
+    directions = [(0, 1, 's'), (1, 0, 'd'), (0, -1, 'w'), (-1, 0, 'a')]  # (delta_x, delta_y, key)
 
     target_coordinates = [p if isinstance(p, Point) else Point(*p) for p in target_coordinates]
     num_targets = len(target_coordinates)
@@ -62,22 +62,26 @@ def find_shortest_solution(target_coordinates):
 
         # explore neighbors
         for delta_x, delta_y, key in directions:
-            next_pos = Point(current_pos.x + delta_x, (current_pos.y + delta_y) % rows)
-            # skip if x is out of range, y is allowed to wrap
-            if next_pos.x < 0 or next_pos.x >= cols:
-                continue
+            new_x, new_y = current_pos.x + delta_x, current_pos.y + delta_y
+            # correct for wrapping
+            if new_x == -1:
+                new_x, new_y = cols-1, new_y-1
+            elif new_x == cols:
+                new_x, new_y = 0, new_y+1
+            new_y = new_y % rows
 
+            next_pos = Point(new_x, new_y)
             pos_mask = 1 << ((next_pos.y * cols) + next_pos.x)
             next_visited_mask = visited_mask | pos_mask
             # skip if visited
             if visited_mask == next_visited_mask:
                 continue
 
-            path_head = ReverseLinkedNode(key, path_head, path_head.idx+1)
+            next_path_head = ReverseLinkedNode(key, path_head, path_head.idx+1)
             # if next_pos is a target point
             if target_mask & pos_mask != 0:
-                path_head = ReverseLinkedNode('return', path_head, path_head.idx+1)
-            queue.append((next_pos, next_visited_mask, path_head))
+                next_path_head = ReverseLinkedNode('return', next_path_head, next_path_head.idx+1)
+            queue.append((next_pos, next_visited_mask, next_path_head))
 
     raise Exception('No solution found')
 
@@ -86,6 +90,7 @@ def main(bbox):
     im = ImageGrab.grab(bbox)
     im = im.resize((1920,1080))
     sub0_ = im.crop(tofind)
+    sub0_.save(f'./logs/fingerprint.png')
     sub0 = cv2.cvtColor(np.array(sub0_.resize((round(sub0_.size[0] * 0.77), round(sub0_.size[1] * 0.77)))), cv2.COLOR_BGR2GRAY) # need to resize the image because fingerprints parts is smaller than the image + need gray image to do the matchTemplate
 
     # will store the location of the rights fingerprints
