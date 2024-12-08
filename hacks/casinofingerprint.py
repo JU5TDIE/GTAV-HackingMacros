@@ -33,8 +33,6 @@ def find_shortest_solution(target_coordinates):
     directions = [(0, 1, 's'), (1, 0, 'd'), (0, -1, 'w'), (-1, 0, 'a')]  # (delta_x, delta_y, key)
 
     target_coordinates = [p if isinstance(p, Point) else Point(*p) for p in target_coordinates]
-    num_targets = len(target_coordinates)
-    assert num_targets == 4, 'Wrong number of targets'
     target_mask = 0
     for target in target_coordinates:
         target_mask |= 1 << ((target.y * cols) + target.x)
