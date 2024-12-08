@@ -53,12 +53,11 @@ def find_shortest_solution(target_coordinates):
 
         # if all target points are visited, return the final path
         if visited_mask & target_mask == target_mask:
-            path_head = ReverseLinkedNode('tab', path_head, path_head.idx+1)
             output_list = [None] * (path_head.idx + 1)
             while path_head.idx >= 0:
                 output_list[path_head.idx] = path_head.value
                 path_head = path_head.prev_node
-            return output_list
+            return output_list + ['tab']
 
         # explore neighbors
         for delta_x, delta_y, key in directions:
