@@ -87,7 +87,6 @@ def main(bbox):
     im = ImageGrab.grab(bbox)
     im = im.resize((1920,1080))
     sub0_ = im.crop(tofind)
-    sub0_.save(f'./logs/fingerprint.png')
     sub0 = cv2.cvtColor(np.array(sub0_.resize((round(sub0_.size[0] * 0.77), round(sub0_.size[1] * 0.77)))), cv2.COLOR_BGR2GRAY) # need to resize the image because fingerprints parts is smaller than the image + need gray image to do the matchTemplate
 
     # will store the location of the rights fingerprints
