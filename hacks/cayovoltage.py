@@ -1,6 +1,6 @@
 import cv2
 import time
-import keyboard
+from directinput import press_and_release
 import numpy as np
 from PIL import ImageGrab
 
@@ -93,7 +93,7 @@ def calculate(a, b, c):
                 if (a == b[z] * c[x] + b[v] * c[n] + b[k] * c[l]):
                     print('-', moves[tuple(moves)[i]])
                     for key in (moves[tuple(moves)[i]]):
-                        keyboard.press_and_release(key)
+                        press_and_release(key)
                         if key == 's' or 'w' or 'enter':
                             time.sleep(0.025)
                         if key == 'return':

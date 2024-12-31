@@ -1,5 +1,6 @@
 import cv2
 import time
+from directinput import press_and_release
 import keyboard
 import numpy as np
 from PIL import Image, ImageGrab
@@ -100,7 +101,7 @@ def main(bbox):
 
     print('-', moves)
     for key in moves:
-        keyboard.press_and_release(key)
+        press_and_release(key)
         time.sleep(0.025)
     print('[*] END')
     print('=============================================')

@@ -1,6 +1,6 @@
 import cv2
 import time
-import keyboard
+from directinput import press_and_release
 import numpy as np
 from PIL import ImageGrab
 
@@ -39,7 +39,7 @@ def check(bbox):
         crop_img = blackAndWhiteImage[92:92 + 1, 44:44 + 1]
 
         if np.mean(crop_img) == 0:
-            keyboard.press_and_release('w')
+            press_and_release('w')
             time.sleep(0.025)
         elif np.mean(crop_img) == 255:
             break
@@ -81,7 +81,7 @@ def calculate(numbers):
 
     print('-', keyboardgo)
     for key in keyboardgo:
-        keyboard.press_and_release(key)
+        press_and_release(key)
         if key == 's' or 'w':
             time.sleep(0.025)
         if key == 'return':
